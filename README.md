@@ -1,6 +1,8 @@
-# Bulk import flashcards from Google Sheets into Anki
+# Welcome to gSheetToAnki!
 
-This is a Python script that reads a Google Sheets file and imports the flashcards into Anki. It uses the `gspread` library to read the Google Sheets file and the `anki-connect` library to create the Anki flashcards.
+![image](https://github.com/barthollomew/gSheetToAnki/assets/129575317/103fef7a-51f8-4d66-832a-f2f81a7ca060)
+
+Effortlessly import flashcards from Google Sheets into Anki with this Python script. This is a Python script that reads a Google Sheets file and imports the flashcards into Anki. It uses the `gspread` library to read the Google Sheets file and the `anki-connect` library to create the Anki flashcards.
 
 ## Prerequisites
 
