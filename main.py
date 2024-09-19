@@ -1,75 +1,55 @@
-import gspread
-import json
-import requests
 import argparse
+import logging
+from tqdm import tqdm
 
-def authenticate_google_sheets(credentials_file):
-    """Authenticate with Google Sheets"""
-    try:
-        gc = gspread.service_account(filename=credentials_file)
-        return gc
-    except Exception as e:
-        print(f"Error authenticating with Google Sheets: {e}")
-        return None
-
-def open_sheet(gc, sheet_name):
-    """Open the Google Sheets."""
-    try:
-        sheet = gc.open(sheet_name).sheet1
-        return sheet
-    except Exception as e:
-        print(f"Error opening the Google Sheets file: {e}")
-        return None
-
-def create_anki_flashcard(front, back, deck_name):
-    """Create flashcard."""
-    note = {
-        "action": "addNote",
-        "version": 6,
-        "params": {
-            "note": {
-                "deckName": deck_name,
-                "modelName": "Basic",
-                "fields": {
-                    "Front": front,
-                    "Back": back
-                },
-                "tags": []
-            }
-        }
-    }
-    return note
-
-def send_to_anki(note):
-    """Send the flashcard to Anki using AnkiConnect."""
-    try:
-        response = requests.post('http://localhost:8765', json.dumps(note))
-        return response.json()
-    except Exception as e:
-        print(f"Error sending flashcard to Anki: {e}")
-        return None
+from utils.google_sheets import authenticate_google_sheets, open_sheet
+from utils.anki import create_anki_flashcard, send_to_anki
+from utils.helpers import validate_args
 
 def main(args):
-    # Authenticate and open file
+    """
+    Main function to handle the import of flashcards from Google Sheets to Anki.
+
+    Args:
+        args (argparse.Namespace): Parsed command-line arguments.
+    """
+    logging.basicConfig(level=logging.INFO)
+    
+    if not validate_args(args):
+        return
+
     gc = authenticate_google_sheets(args.credentials)
     if not gc:
         return
+    
     sheet = open_sheet(gc, args.sheet_name)
     if not sheet:
         return
 
-    # Loop through each row and create a flashcard
-    for i, row in enumerate(sheet.get_all_records(), start=1):
-        front = row['Front']
-        back = row['Back']
-        note = create_anki_flashcard(front, back, args.deck_name)
+    records = sheet.get_all_records()
+    if not records:
+        logging.info("No records found in the Google Sheet.")
+        return
 
-        # Send the note to Anki using AnkiConnect
+    logging.info(f"Starting to create flashcards in deck '{args.deck_name}'...")
+
+    for i, row in enumerate(tqdm(records, desc="Creating flashcards", unit="card"), start=1):
+        front = row.get('Front')
+        back = row.get('Back')
+
+        if not front or not back:
+            logging.warning(f"Skipping row {i} due to missing 'Front' or 'Back' fields.")
+            continue
+
+        note = create_anki_flashcard(front, back, args.deck_name)
         response = send_to_anki(note)
-        if response:
-            print(f"Flashcard {i} created successfully.")
+
+        if response and response.get('error') is None:
+            logging.info(f"Flashcard {i} created successfully.")
         else:
-            print(f"Failed to create flashcard {i}.")
+            logging.error(f"Failed to create flashcard {i}. Error: {response.get('error')}")
+
+    logging.info("Flashcard creation process completed.")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Import flashcards from Google Sheets into Anki')
