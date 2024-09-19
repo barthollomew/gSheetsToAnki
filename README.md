@@ -1,48 +1,49 @@
-# Welcome to gSheetToAnki!
+## gSheetsToAnki
 
-![image](https://github.com/barthollomew/gSheetToAnki/assets/129575317/103fef7a-51f8-4d66-832a-f2f81a7ca060)
 
-Effortlessly import flashcards from Google Sheets into Anki with this Python script. This is a Python script that reads a Google Sheets file and imports the flashcards into Anki. It uses the `gspread` library to read the Google Sheets file and the `anki-connect` library to create the Anki flashcards.
+gSheetsToAnki is a dead simple Python program that imports flashcards from Google Sheets into Anki. Super useful for mass importing definitions and flashcards.
 
-## Prerequisites
+### Features
 
-Before you can run this script, you'll need to have the following:
+- **Google Sheets Integration**: Seamlessly authenticate and retrieve data from your Google Sheets.
+- **Bulk Flashcard Creation**: Automatically generate multiple flashcards based on the content of your Google Sheets.
+- **Customizable Decks**: Specify the Anki deck where your flashcards will be added, allowing for organized study sessions.
+- **Error Handling & Logging**: Comprehensive error management and logging to ensure smooth operation and easy troubleshooting.
+- **Progress Tracking**: Monitor the flashcard creation process with a handy progress bar.
 
-- Anki installed on your computer
-- AnkiConnect add-on installed in Anki (can be found in the Anki Add-ons Gallery)
-- A Google Cloud Platform (GCP) project
-- A service account JSON file for authentication with Google Sheets
+### Setup
 
-You'll also need to install the following Python libraries:
+#### Preparing the Google Sheets API Credentials
 
-- gspread
-- requests
+1. Obtain your Google Sheets API credentials by following the instructions [here](https://developers.google.com/sheets/api/quickstart/python).
+2. Save the credentials JSON file to your local machine.
 
-## How to Use
+#### Installing Dependencies
 
-1. Clone the repository or download the script file.
-2. Install the required Python libraries using `pip install gspread requests`.
-3. Obtain a service account JSON file for authentication with Google Sheets and save it to a secure location.
-4. Open a terminal or command prompt and navigate to the directory where the script is located.
+Navigate to the project directory and install the necessary dependencies:
 
-6. Run the script using the following command:
+```sh
+pip install -r requirements.txt
+```
 
-`python import_gsheets_to_anki.py --credentials path/to/credentials.json --sheet-name "Sheet Name" --deck-name "Deck Name"`
+#### Running the Tool
 
-6. Replace `path/to/credentials.json` with the path to your Google Sheets API credentials file, `"Sheet Name"` with the name of your Google Sheets file, and `"Deck Name"` with the name of the Anki deck you want to add the flashcards to.
-7. The script will read the flashcards from the specified Google Sheets file and import them into the specified Anki deck. It will display a progress message for each flashcard created.
+You can run the Google Sheets to Anki Flashcard Importer from the command line with the following command:
 
-## How it works
+```sh
+python main.py --credentials /path/to/credentials.json --sheet-name "Your Sheet Name" --deck-name "Your Anki Deck Name"
+```
 
-The script uses the `gspread` library to read the Google Sheets file, and the `anki-connect` library to create the Anki flashcards. It loops through each row in the sheet, extracts the values from the 'Front' and 'Back' columns, and creates an Anki note using the AnkiConnect API. The note is then sent to Anki using the `requests` library, which communicates with AnkiConnect running on the default port 8765.
+### Command-line Options
 
-## Resources
+- `--credentials`: Path to the Google Sheets API credentials file.
+- `--sheet-name`: Name of the Google Sheets file containing your flashcards.
+- `--deck-name`: Name of the Anki deck where the flashcards will be added.
 
-- [Anki](https://apps.ankiweb.net/)
-- [AnkiConnect Add-on](https://ankiweb.net/shared/info/2055492159)
-- [gspread Documentation](https://gspread.readthedocs.io/en/latest/)
-- [Google Cloud Platform](https://cloud.google.com/)
+#### Example
 
-## License
+```sh
+python main.py --credentials /path/to/credentials.json --sheet-name "Biology 101" --deck-name "Biology Flashcards"
+```
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This command will import all flashcards from the "Biology 101" Google Sheets file into the "Biology Flashcards" deck in Anki.
